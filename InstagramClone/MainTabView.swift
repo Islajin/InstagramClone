@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct MainTabView: View {
+    
+    @State var tabIndex = 0
+    
     var body: some View {
-        TabView{
+        TabView(selection: tabIndex){
             Text("feed")
                 .tabItem {
                     Image(systemName: "house")
