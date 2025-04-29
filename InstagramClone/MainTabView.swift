@@ -5,7 +5,7 @@ struct MainTabView: View {
     @State var tabIndex = 0
     
     var body: some View {
-        TabView(selection: tabIndex){
+        TabView(selection: $tabIndex){
             Text("feed")
                 .tabItem {
                     Image(systemName: "house")
@@ -15,7 +15,7 @@ struct MainTabView: View {
                 .tabItem{
                     Image(systemName: "magnifyingglass")
                 }.tag(1)
-           NewPostView()
+            NewPostView(tabIndex : $tabIndex)
                 .tabItem{
                     Image(systemName: "plus.square")
                 }.tag(2)
