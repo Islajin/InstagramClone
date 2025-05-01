@@ -12,7 +12,6 @@ struct NewPostView: View {
     @State var caption = ""
     @Binding var tabIndex: Int
     
-    
     var body: some View {
         VStack(){
             HStack{
@@ -32,7 +31,7 @@ struct NewPostView: View {
             }.padding(.horizontal
             )
             
-            Image("latte")
+            Image("image_lion")
                 .resizable()
                 .aspectRatio(1, contentMode:.fit)
                 .frame(maxWidth: .infinity)
@@ -50,7 +49,8 @@ struct NewPostView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     
             }.padding()
-                
+            
+
             
           
         }
