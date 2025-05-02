@@ -6,11 +6,26 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct NewPostView: View {
     
     @State var caption = ""
     @Binding var tabIndex: Int
+    @State var selectedItem : PhotosPickerItem?
+    @State var postImage: Image?
+    
+    func convertImage(item: PhotosPickerItem?) async {
+        
+        //item 을 안전하게 꺼냄 -> data를 컴퓨터가 읽을 수 있는 값으로 변경-> UIImage(UIKit에서 사용하는 이미지 형식)으로 변경->Image(SwiftUI에서 사용하는 이미지 형식)으로 변경
+        
+        guard let item = item else { return }
+        guard let data = try? await item.loadTransferable(type: Data.self) else {return}
+        guard let uiImage = UIImage(data: data) else {return}
+        self.postImage = Image(uiImage: uiImage)
+        
+        
+    }
     
     var body: some View {
         VStack(){
@@ -31,10 +46,36 @@ struct NewPostView: View {
             }.padding(.horizontal
             )
             
-            Image("image_lion")
-                .resizable()
-                .aspectRatio(1, contentMode:.fit)
-                .frame(maxWidth: .infinity)
+            PhotosPicker (selection: $selectedItem ){
+                
+                if let image = self.postImage {
+                    // self.postImage 가 nil 이 아니면, photosPicker로 사진을 장착한 후
+                    image
+                        .resizable()
+                        .aspectRatio(1, contentMode:.fill)
+                        .frame(maxWidth: .infinity, maxHeight: 400)
+                        .clipped()
+                    
+                } else {
+                    //장착 전
+                    Image(systemName: "photo.on.rectangle")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .padding()
+                        .tint(.black)
+                    
+                    
+                    
+                }
+                
+                
+            }.onChange (of: selectedItem) {oldValue, newValue in
+                Task{
+                  await convertImage(item: newValue)
+                }
+                
+            }
 
             TextField("문구를 작성하거나 설문을 추가하세요.", text: $caption)
                 .padding()
