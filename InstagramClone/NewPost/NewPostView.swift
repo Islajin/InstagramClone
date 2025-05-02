@@ -69,7 +69,12 @@ struct NewPostView: View {
             
             Spacer()
             
-            Button{} label:{
+            Button{
+                Task{
+                    await viewModel.uploadPost()
+                }
+                
+            } label:{
                 Text("공유")
                     .frame(width: 363, height: 42)
                     .foregroundStyle(.white)
