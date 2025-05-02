@@ -1,6 +1,9 @@
 import SwiftUI
 import PhotosUI
 import FirebaseStorage
+import FirebaseFirestore
+import FirebaseFirestoreSwift
+
 
 @Observable
 class NewPostViewModel {
@@ -8,6 +11,8 @@ class NewPostViewModel {
     var selectedItem : PhotosPickerItem?
     var postImage: Image?
     var uiImage : UIImage?
+    
+    
     func convertImage(item: PhotosPickerItem?) async {
         
         //item 을 안전하게 꺼냄 -> data를 컴퓨터가 읽을 수 있는 값으로 변경-> UIImage(UIKit에서 사용하는 이미지 형식)으로 변경->Image(SwiftUI에서 사용하는 이미지 형식)으로 변경
@@ -22,11 +27,27 @@ class NewPostViewModel {
     }
     
     
-
+    
     //게시글 업로드 함수 (게시글 : 글 + 사진)
     func uploadPost() async {
         guard let uiImage else {return}
-        let url = await uploadImage(uiImage: uiImage)
+        guard let imageUrl = await uploadImage(uiImage: uiImage) else {return}
+        
+        // postReference = 포스트에 저장할 위치 정보를 가짐
+        let postReference = Firestore.firestore().collection("posts").document()
+        
+        let post = Post(id: postReference.documentID, caption: caption, like: 0, imageURL: imageUrl, date: Date())
+        
+        do{
+            //swift에서 쓴 것을 firebase로 내보내야하니까 인코딩을 씀
+            let encodedData =  try Firestore.Encoder().encode(post)
+            try await postReference.setData(encodedData)
+        }
+        catch
+        {print("\(error.localizedDescription)")}
+        
+        
+        
     }
     
     
@@ -47,6 +68,7 @@ class NewPostViewModel {
         do{ //putDataAsync 와 downloadURL 모두 Async 로 Task 가 필요한데, 그냥 상위로 넘김
             //reference에 우리가 압축한 이미지 데이터를 넣어줌, metaData는 이미지 정보를 가짐
             let metaData = try await reference.putDataAsync(imageData)
+            print("metaData: ", metaData)
             
             //이미지가 올라간 거를 게시글에 저장할껀데, 데이터는 이 이미지 스토리지에 저장하고, 이미지가 올라간 url만 이 게시글에 저장해 놓도록 할꺼임
             let url = try await reference.downloadURL()
@@ -57,7 +79,14 @@ class NewPostViewModel {
             print("\(error.localizedDescription)")
             return nil
         }
-        
+
+    }
+    
+    func clearData() {
+        caption = ""
+        selectedItem = nil
+        postImage = nil
+        uiImage = nil
     }
     
     

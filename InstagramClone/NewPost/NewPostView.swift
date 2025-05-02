@@ -72,6 +72,8 @@ struct NewPostView: View {
             Button{
                 Task{
                     await viewModel.uploadPost()
+                    viewModel.clearData()
+                    tabIndex = 0 
                 }
                 
             } label:{
