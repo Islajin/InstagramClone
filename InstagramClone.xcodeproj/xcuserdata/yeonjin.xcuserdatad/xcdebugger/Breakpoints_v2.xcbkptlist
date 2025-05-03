@@ -35,7 +35,7 @@
                </Location>
                <Location
                   uuid = "2B78B49B-72C5-4FB6-AA3F-10441C673185 - a04a0fc472e1e3a1"
-                  shouldBeEnabled = "Yes"
+                  shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "InstagramClone.NewPostViewModel.__deallocating_deinit"
