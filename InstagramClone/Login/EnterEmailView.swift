@@ -30,15 +30,7 @@ struct EnterEmailView: View {
                     .padding(.bottom, 10)
                 
                 TextField("이메일", text: .constant(""))
-                    .textInputAutocapitalization(.never)
-                    .padding(12)
-                    .frame(width: 363, height: 42)
-                    .background(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay(RoundedRectangle(cornerRadius: 10)
-                        .stroke(.gray, lineWidth: 1.0)
-                    )
-                    .padding(.horizontal)
+                    .modifier(InstagramTextFieldModifier())
                 
                 NavigationLink{
                     EnterPasswordView()
@@ -63,11 +55,12 @@ struct EnterEmailView: View {
                     dismiss()
                 }label:{
                     Image(systemName: "chevron.left")
+                        .tint(.black)
                     
                 }
                 
             }
-        }.tint(.black)
+        }
         
     }
 }
