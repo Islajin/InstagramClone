@@ -14,8 +14,7 @@ struct CompleteSignupView: View {
     var body: some View {
         @Bindable var signupViewModel = signupViewModel
         
-        ZStack{
-            GradientBackgroundView()
+        SignUpBackgroundView {
             VStack{
                 Image("instagramLogo2")
                     .resizable()
@@ -41,8 +40,11 @@ struct CompleteSignupView: View {
                     .padding(.horizontal)
                 
                 Spacer()
-                Button{}label: {
-                    signupViewModel.createUser()
+                Button{
+                    Task{
+                       await signupViewModel.createUser()}
+                }label: {
+         
                     Text("완료")
                         .foregroundStyle(.white)
                         .frame(width: 363, height:42)
@@ -54,18 +56,6 @@ struct CompleteSignupView: View {
                 
             }
         }
-        .navigationBarBackButtonHidden()
-        .toolbar{
-            ToolbarItem(placement: .topBarLeading){
-                Button{
-                    dismiss()
-                }label:{
-                    Image(systemName: "chevron.left")
-                    
-                }
-                
-            }
-        }.tint(.black)
     }
 }
 
