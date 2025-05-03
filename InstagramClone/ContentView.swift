@@ -8,8 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    
+    @State var isLogin = false
+    @State var signupViewModel = SignupViewModel()
+    
     var body: some View {
-        MainTabView()
+        if isLogin == true {
+            MainTabView()
+        }
+        else {
+            LoginView()
+                .environment(signupViewModel)
+        }
+       
     }
 }
 
