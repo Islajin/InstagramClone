@@ -8,13 +8,9 @@
 import SwiftUI
 
 struct EnterPasswordView: View {
-
-    @Environment(\.dismiss) var dismiss
-    
     var body: some View {
-        ZStack{
-            GradientBackgroundView()
-            
+
+        SignUpBackgroundView{
             VStack(){
                 Text("비밀번호 만들기")
                     .font(.title)
@@ -48,18 +44,6 @@ struct EnterPasswordView: View {
                 
             }
             
-        }
-        .navigationBarBackButtonHidden()
-        .toolbar{
-            ToolbarItem(placement: .topBarLeading){
-                Button{
-                    dismiss()
-                }label:{
-                    Image(systemName: "chevron.left")
-                        .tint(.black)
-                }
-                
-            }
         }
         
     }

@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct EnterUserNameView: View {
- 
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        ZStack{
-            GradientBackgroundView()
+        SignUpBackgroundView {
+            
             
             VStack(){
                 Text("사용자 이름 만들기")
@@ -22,8 +20,8 @@ struct EnterUserNameView: View {
                     .frame(maxWidth: .infinity, alignment: .leading) // 이렇게 하나만 왼쪽정렬 시키고 싶으면 frame을 꽉차게 주고 왼쪽정렬 시켜주면 된다.
                     .padding(.horizontal)
                     .padding(.bottom, 5)
-                    
-                    
+                
+                
                 Text("사용자 이름을 직접 추가하거나 추천 이름을 사용하세요. 언제든지 변경할 수 있습니다.")
                     .font(.callout)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -48,19 +46,6 @@ struct EnterUserNameView: View {
                 
             }
             
-        }
-        .navigationBarBackButtonHidden()
-        .toolbar{
-            ToolbarItem(placement: .topBarLeading){
-                Button{
-                    dismiss()
-                }label:{
-                    Image(systemName: "chevron.left")
-                        .tint(.black)
-                    
-                }
-                
-            }
         }
         
     }

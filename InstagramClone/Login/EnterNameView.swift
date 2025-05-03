@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct EnterNameView: View {
-   
-    @Environment(\.dismiss) var dismiss
-    
     var body: some View {
-        ZStack{
-            GradientBackgroundView()
+      
+        SignUpBackgroundView{
+            
             
             VStack(){
                 Text("이름 입력")
@@ -22,8 +20,8 @@ struct EnterNameView: View {
                     .frame(maxWidth: .infinity, alignment: .leading) // 이렇게 하나만 왼쪽정렬 시키고 싶으면 frame을 꽉차게 주고 왼쪽정렬 시켜주면 된다.
                     .padding(.horizontal)
                     .padding(.bottom, 5)
-                    
-                    
+                
+                
                 
                 TextField("성명", text: .constant(""))
                     .modifier(InstagramTextFieldModifier())
@@ -42,23 +40,10 @@ struct EnterNameView: View {
                 Spacer()
                 
             }
-            
         }
-        .navigationBarBackButtonHidden()
-        .toolbar{
-            ToolbarItem(placement: .topBarLeading){
-                Button{
-                    dismiss()
-                }label:{
-                    Image(systemName: "chevron.left")
-                        .tint(.black)
-                }
-                
-            }
         }
         
     }
-}
 
 #Preview {
     EnterNameView()
