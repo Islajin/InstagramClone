@@ -25,6 +25,7 @@ struct EnterEmailView: View {
                     
                 Text("회원님에게 연락할 수 있는 이메일 주소를 입력하세요. 이 이메일 주소는 프로필에서 다른 사람에게 공개되지 않습니다.")
                     .font(.callout)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     .padding(.bottom, 10)
                 
@@ -39,8 +40,8 @@ struct EnterEmailView: View {
                     )
                     .padding(.horizontal)
                 
-                Button{
-                    
+                NavigationLink{
+                    EnterPasswordView()
                 }label:{
                     Text("다음")
                 }.padding(12)
