@@ -1,5 +1,5 @@
 //
-//  EnterUserNameView.swift
+//  EnterNameView.swift
 //  InstagramClone
 //
 //  Created by yeonjin on 5/3/25.
@@ -7,14 +7,16 @@
 
 import SwiftUI
 
-struct EnterUserNameView: View {
+struct EnterNameView: View {
+    @Environment(SignupViewModel.self) var signupViewModel
     
     var body: some View {
-        SignUpBackgroundView {
+        @Bindable var signupViewModel = signupViewModel
+        SignUpBackgroundView{
             
             
             VStack(){
-                Text("사용자 이름 만들기")
+                Text("이름 입력")
                     .font(.title)
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity, alignment: .leading) // 이렇게 하나만 왼쪽정렬 시키고 싶으면 frame을 꽉차게 주고 왼쪽정렬 시켜주면 된다.
@@ -22,17 +24,12 @@ struct EnterUserNameView: View {
                     .padding(.bottom, 5)
                 
                 
-                Text("사용자 이름을 직접 추가하거나 추천 이름을 사용하세요. 언제든지 변경할 수 있습니다.")
-                    .font(.callout)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.bottom, 10)
                 
-                TextField("이메일", text: .constant(""))
+                TextField("성명", text: $signupViewModel.name)
                     .modifier(InstagramTextFieldModifier())
                 
                 NavigationLink{
-                    CompleteSignupView()
+                    EnterUserNameView()
                 }label:{
                     Text("다음")
                 }.padding(12)
@@ -45,12 +42,11 @@ struct EnterUserNameView: View {
                 Spacer()
                 
             }
-            
+        }
         }
         
     }
-}
 
 #Preview {
-    EnterUserNameView()
+    EnterNameView()
 }

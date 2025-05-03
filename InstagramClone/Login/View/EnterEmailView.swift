@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct EnterEmailView: View {
-    
+
+    @Environment(SignupViewModel.self) var signupViewModel
     
     var body: some View {
+        @Bindable var signupViewModel = signupViewModel
         SignUpBackgroundView {
             
             
@@ -29,7 +31,7 @@ struct EnterEmailView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 10)
                 
-                TextField("이메일", text: .constant(""))
+                TextField("이메일", text: $signupViewModel.email)
                     .modifier(InstagramTextFieldModifier())
                 
                 NavigationLink{
