@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct EnterEmailView: View {
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         ZStack{
             GradientBackgroundView()
@@ -47,8 +49,25 @@ struct EnterEmailView: View {
                     .foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding(.horizontal)
+                
+                Spacer()
+                
             }
+            
         }
+        .navigationBarBackButtonHidden()
+        .toolbar{
+            ToolbarItem(placement: .topBarLeading){
+                Button{
+                    dismiss()
+                }label:{
+                    Image(systemName: "chevron.left")
+                    
+                }
+                
+            }
+        }.tint(.black)
+        
     }
 }
 
