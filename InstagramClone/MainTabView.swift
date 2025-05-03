@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct MainTabView: View {
     
@@ -19,7 +20,15 @@ struct MainTabView: View {
                 .tabItem{
                     Image(systemName: "plus.square")
                 }.tag(2)
-            Text("Reels")
+            
+            VStack {
+                Text("Reels")
+                Button{
+                    AuthManager.shared.signout()
+                }label:{
+                    Text("Logout")
+                }
+            }
                 .tabItem{
                     Image(systemName: "movieclapper")
                 }.tag(3)

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+import FirebaseAuth
 
 @Observable
 class SignupViewModel {
@@ -15,9 +15,13 @@ class SignupViewModel {
     var password = ""
     var name = ""
     var username = ""
-    
-    func createUser() {
+ 
+    func createUser() async {
+        await AuthManager.shared.createUser(email: email, password: password, name: name, username: username)
         
-        
+        email = ""
+        password = ""
+        name = ""
+        username = ""  
     }
 }
