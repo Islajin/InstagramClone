@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LoginView: View {
+    @State var viewModel = LoginViewModel()
     
     var body: some View {
         
@@ -18,13 +19,15 @@ struct LoginView: View {
                     Spacer()
                     
                     VStack {
-                        TextField("이메일 주소", text: .constant(""))
+                        TextField("이메일 주소", text: $viewModel.email)
                             .modifier(InstagramTextFieldModifier())
                         
-                        SecureField("비밀번호", text: .constant(""))
+                        SecureField("비밀번호", text: $viewModel.password)
                             .modifier(InstagramTextFieldModifier())
                         
-                        Button{
+                        Button {
+                            Task {
+                                await viewModel.signin() }
                         } label:{
                             Text("로그인")
                                 .frame(width: 363, height: 42)
