@@ -32,7 +32,8 @@ struct MainTabView: View {
                 .tabItem{
                     Image(systemName: "movieclapper")
                 }.tag(3)
-            Text("Profile")
+            
+            ProfileView()
                 .tabItem{
                     Image(systemName: "person.circle.fill")
                 }.tag(4)
