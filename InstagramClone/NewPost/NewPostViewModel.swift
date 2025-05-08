@@ -16,14 +16,16 @@ class NewPostViewModel {
     func convertImage(item: PhotosPickerItem?) async {
         
         //item 을 안전하게 꺼냄 -> data를 컴퓨터가 읽을 수 있는 값으로 변경-> UIImage(UIKit에서 사용하는 이미지 형식)으로 변경->Image(SwiftUI에서 사용하는 이미지 형식)으로 변경
+//        
+//        guard let item = item else { return }
+//        guard let data = try? await item.loadTransferable(type: Data.self) else {return}
+//        guard let uiImage = UIImage(data: data) else {return}
+//        self.postImage = Image(uiImage: uiImage)
+//        self.uiImage = uiImage
         
-        guard let item = item else { return }
-        guard let data = try? await item.loadTransferable(type: Data.self) else {return}
-        guard let uiImage = UIImage(data: data) else {return}
-        self.postImage = Image(uiImage: uiImage)
-        self.uiImage = uiImage
-        
-        
+        guard let imageSelection = await ImageManager.convertImage(item: item) else { return }
+        self.postImage = imageSelection.image
+        self.uiImage = imageSelection.uiImage
     }
     
     
@@ -31,12 +33,20 @@ class NewPostViewModel {
     //게시글 업로드 함수 (게시글 : 글 + 사진)
     func uploadPost() async {
         guard let uiImage else {return}
-        guard let imageUrl = await uploadImage(uiImage: uiImage) else {return}
+        
+//        guard let imageUrl = await uploadImage(uiImage: uiImage) else {return} -> 리팩토링해서 밑에 있는 코드로 변경
+//        guard let imageUrl = await ImageManager.uploadImage(uiImage : uiImage, path : "images") else { return }
+//        위의 코드에서 path 를 enum 타입으로 받을 때 변경된 코드
+        
+        guard let imageUrl = await ImageManager.uploadImage(uiImage : uiImage, path : .post) else { return }
+        
+        //유저 아이디를 가져와서 사용자가 글이랑 사진을 저장할때마다 firebase에 게시글이 업로드 됨
+        guard let userId = AuthManager.shared.currentAuthUser?.uid else {return}
         
         // postReference = 포스트에 저장할 위치 정보를 가짐
         let postReference = Firestore.firestore().collection("posts").document()
         
-        let post = Post(id: postReference.documentID, caption: caption, like: 0, imageURL: imageUrl, date: Date())
+        let post = Post(id: postReference.documentID, userId: userId, caption: caption, like: 0, imageURL: imageUrl, date: Date())
         
         do{
             //swift에서 쓴 것을 firebase로 내보내야하니까 인코딩을 씀
