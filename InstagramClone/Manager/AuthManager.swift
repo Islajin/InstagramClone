@@ -12,6 +12,7 @@ import Firebase
 @Observable
 class AuthManager {
     
+    //어디에서든 접근하던 로그인한 유저를 알 수 있어야 하기 때문에 싱글톤 사용
     static let shared = AuthManager()
     
     
@@ -19,6 +20,7 @@ class AuthManager {
     //문제는 앱을 실행할 때마다 nil로 초기화 된다. //Auth는 password랑 email만 관리함
     var currentAuthUser: FirebaseAuth.User?
     
+        //CurrentUser 가 nil 이어서 아직
     var currentUser : User?
     
     init() {
@@ -79,6 +81,8 @@ class AuthManager {
         do {
             self.currentUser =
             try await Firestore.firestore().collection("users").document(userId).getDocument(as: User.self)
+            
+            let result = try await Firestore.firestore().collection("users").document(userId).getDocument()
         }
         catch{}
         }
@@ -86,7 +90,9 @@ class AuthManager {
     func signout() {
         do {
             try Auth.auth().signOut()
-            currentAuthUser = nil //signout했을 때 nil로 바꿔준다.
+            currentAuthUser = nil
+            currentUser = nil
+            //signout했을 때 nil로 바꿔준다.
             
         }catch{
             print("DEBUG: Failed to sign out with error \(error.localizedDescription)")
