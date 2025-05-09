@@ -162,10 +162,11 @@ class ProfileViewModel{
                 let post = try document.data(as: Post.self)
                 //그래서 배열안에 저장 할 것 임
                 posts.append(post)
-                
+            }
+            
                 self.posts = posts
                 //함수 안에서 변형한 posts를 바깥에 있는 self.posts에 넣음
-            }
+            
         }catch{
             print("DEBUG: Failed to load user posts with error \(error.localizedDescription)")
         }
