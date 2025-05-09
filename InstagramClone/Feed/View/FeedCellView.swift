@@ -6,17 +6,33 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct FeedCellView: View {
+//    let post: Post
+    
+    // 지금 FeedCellViewModel 이 하는 일이 모델을 읽기만 하기 때문에 그냥
+    // let post: Post 이렇게 작성해도 됨
+    
+    @State var viewModel: FeedCellViewModel
+    
+   
+    init(post: Post ){
+        self.viewModel = FeedCellViewModel(post: post)
+        //넘겨받는 건 post 고, ViewModel은 내부에서 직접 만듬
+    }
     var body: some View {
         VStack {
-            Image("image_dragon2")
+           
+            KFImage(URL(string: viewModel.post.imageURL))
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
                 .overlay (alignment: .top){
+                    
                     HStack {
-                        Image("image_lion4")
+//                        Image("image_lion4")
+                        KFImage(URL(string: viewModel.post.user?.profileImageUrl ?? ""))
                             .resizable()
                             .frame(width: 35, height: 35)
                             .clipShape(Circle())
@@ -24,7 +40,8 @@ struct FeedCellView: View {
                                 Circle()
                                     .stroke(Color(red : 191/255, green: 11/255, blue:100/255), lineWidth: 2)
                             }
-                        Text("general.cat")
+                        //userid로 가져온 user 안에 있는 것에 접근은 이렇게 하면 됨
+                        Text("\(viewModel.post.user?.username ?? "" )")
                             .foregroundStyle(.white)
                             .bold()
                         Spacer()
@@ -44,12 +61,12 @@ struct FeedCellView: View {
             }.imageScale(.large)
                 .padding(.horizontal)
             
-            Text("좋아요 25,239개")
+            Text("좋아요 \(viewModel.post.like)개 ")
                 .font(.footnote)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
             
-            Text("general.cat" + " " + "상세 글 정보")
+            Text("\(viewModel.post.user?.username ?? "" )" + " " + viewModel.post.caption)
                 .font(.footnote)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
@@ -71,8 +88,4 @@ struct FeedCellView: View {
         }
         .padding(.bottom)
     }
-}
-
-#Preview {
-    FeedCellView()
 }

@@ -10,5 +10,10 @@ struct Post : Codable , Identifiable{
     var like: Int
     var imageURL: String
     let date: Date
+    
+    var user: User?
+    //FeedCellView에서 User의 정보가 필요하기 떄문에 userId를 키 값으로 사용해서 user를 찾은 다음에 User에 해당 하는 값을 저장해주자.
 }
+
+
 
