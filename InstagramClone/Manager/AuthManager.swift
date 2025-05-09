@@ -20,13 +20,13 @@ class AuthManager {
     //문제는 앱을 실행할 때마다 nil로 초기화 된다. //Auth는 password랑 email만 관리함
     var currentAuthUser: FirebaseAuth.User?
     
-        //CurrentUser 가 nil 이어서 아직
+    //CurrentUser 가 nil 이어서 아직
     var currentUser : User?
     
     init() {
         currentAuthUser = Auth.auth().currentUser
         Task {
-            await loadUserData()
+            await loadCurrentUserData()
         }
     }
     
@@ -63,16 +63,16 @@ class AuthManager {
     
     func signin(email:String, password: String) async {
         do{
-           let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
             currentAuthUser = result.user
-            await loadUserData() //로그인하면서 데이터를 가져오기
+            await loadCurrentUserData() //로그인하면서 데이터를 가져오기
         }
         
         catch{}
         
     }
     
-    func loadUserData() async {
+    func loadCurrentUserData() async {
         //현재의 user의 uid를 userId에 저장함
         guard let userId = self.currentAuthUser?.uid else {return}
         
@@ -81,12 +81,27 @@ class AuthManager {
         do {
             self.currentUser =
             try await Firestore.firestore().collection("users").document(userId).getDocument(as: User.self)
+        }
+        catch{
+            print("DEBUG: Failed to load user data with error \(error.localizedDescription)")
+        }
+    }
+    
+    
+    func loadUserData(userId: String) async -> User? {
+        //전달받은 userId로 찾아야 함
+        do {
             
-            let result = try await Firestore.firestore().collection("users").document(userId).getDocument()
+            let user = try await Firestore.firestore().collection("users").document(userId).getDocument(as: User.self)
+            return user
         }
-        catch{}
+        catch{
+            print("DEBUG: Failed to load user data with error \(error.localizedDescription)")
+            return nil
         }
-
+    }
+     
+    
     func signout() {
         do {
             try Auth.auth().signOut()
