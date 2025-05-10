@@ -31,19 +31,30 @@ struct FeedCellView: View {
                 .overlay (alignment: .top){
                     
                     HStack {
-//                        Image("image_lion4")
-                        KFImage(URL(string: viewModel.post.user?.profileImageUrl ?? ""))
-                            .resizable()
-                            .frame(width: 35, height: 35)
-                            .clipShape(Circle())
-                            .overlay {
-                                Circle()
-                                    .stroke(Color(red : 191/255, green: 11/255, blue:100/255), lineWidth: 2)
-                            }
-                        //userid로 가져온 user 안에 있는 것에 접근은 이렇게 하면 됨
-                        Text("\(viewModel.post.user?.username ?? "" )")
-                            .foregroundStyle(.white)
-                            .bold()
+
+                        NavigationLink {
+                            
+                            if let user = viewModel.post.user {
+                                ProfileView(viewModel: ProfileViewModel(user: user)) }
+                            
+                            
+                        } label: {
+                            //label이 현재 보이는 버튼 같은 화면
+                            KFImage(URL(string: viewModel.post.user?.profileImageUrl ?? ""))
+                                .resizable()
+                                .frame(width: 35, height: 35)
+                                .clipShape(Circle())
+                                .overlay {
+                                    Circle()
+                                        .stroke(Color(red : 191/255, green: 11/255, blue:100/255), lineWidth: 2)
+                                }
+                            //userid로 가져온 user 안에 있는 것에 접근은 이렇게 하면 됨
+                            Text("\(viewModel.post.user?.username ?? "" )")
+                                .foregroundStyle(.white)
+                                .bold()
+                        }
+
+                        
                         Spacer()
                         Image(systemName: "line.3.horizontal")
                             .foregroundStyle(.white)
