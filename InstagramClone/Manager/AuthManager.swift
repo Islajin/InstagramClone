@@ -114,3 +114,67 @@ class AuthManager {
         }
     }
 }
+
+
+extension AuthManager {
+    func follow(userId: String?) async {
+        guard let currentUserId =  currentUser?.id else {return}
+        guard let userId else {return} //  변수명과 비인딩할 변수명이 같으면 이렇게 사용해도 됨
+        
+        do{
+            async let _ = try await Firestore.firestore().collection("following").document(currentUserId).collection("user-follower").document(userId).setData([:])
+            
+            //async let 을 써주면 동시에 실행하겠다라는 의미 setData([:])는 빈배열을 넣어준 것을 뜻함
+            
+            async let _ = try await
+            Firestore.firestore().collection("follower").document(userId).collection("user-follower").document(currentUserId).setData([:])
+
+            
+        }catch {
+            print("DEBUG: Failed to save follow data with error \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func unfollow(userId: String?) async {
+        
+        guard let currentUserId =  currentUser?.id else {return}
+        guard let userId else {return}
+        do{
+            try await Firestore.firestore().collection("following").document(currentUserId).collection("user-follower").document(userId).delete()
+
+            //async let 을 써주면 동시에 실행하겠다라는 의미 setData([:])는 빈배열을 넣어준 것을 뜻함
+            
+           try await
+            Firestore.firestore().collection("follower").document(userId).collection("user-follower").document(currentUserId).delete()
+            
+            
+        }catch {
+            print("DEBUG: Failed to delete follow data with error \(error.localizedDescription)")
+        }
+        
+        
+    }
+    
+    func checkFollow(userId: String?) async -> Bool {
+        guard let currentUserId = currentUser?.id else {return false}
+        guard let userId else {return false}
+        
+        do {
+            let isFollowing = try await Firestore.firestore()
+                .collection("following")
+                .document(currentUserId)
+                .collection("user-following")
+                .document(userId)
+                .getDocument().exists
+            return isFollowing
+        }
+        
+        catch {
+            print("DEBUG :; Failed to check follow data with error \(error.localizedDescription) ")
+            return false
+        }
+    
+    }
+    
+}
