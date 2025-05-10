@@ -9,9 +9,9 @@ import SwiftUI
 import Kingfisher
 
 struct ProfileView: View {
-    
+    @Environment(\.dismiss) var dismiss
     @State var viewModel = ProfileViewModel()
- 
+    
     
     let columns : [GridItem] = [
         GridItem(.flexible(), spacing:2),
@@ -40,7 +40,7 @@ struct ProfileView: View {
                             
                         }else if let imageUrl = viewModel.user?.profileImageUrl{  // 서버에 있는지를 체크해야함
                             let url = URL(string: imageUrl)
-                  
+                            
                             KFImage(url)
                                 .resizable()
                                 .frame(width:75 ,height:75)
@@ -85,45 +85,89 @@ struct ProfileView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                     
-                    NavigationLink{
-                        ProfileEditingView(viewModel: viewModel)
-                    }label:{
-                        Text("프로필 편집")
-                            .bold()
-                            .foregroundStyle(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 35)
-                            .background(Color.gray.opacity(0.2))
-                            .foregroundColor(.black)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .padding(.horizontal)
-                            .padding(.top, 10)
-                    }
-                    Divider()
-                        .padding()
-                    
-                    LazyVGrid(columns: columns, spacing:2) {
+                    if viewModel.user?.isCurrentUser == true {
                         
-                        ForEach(viewModel.posts) {post in
-                            let url = URL(string:post.imageURL)
-                            KFImage(url)
-                                .resizable()
-                                .aspectRatio(1, contentMode:.fill )
+                        
+                        NavigationLink{
+                            ProfileEditingView(viewModel: viewModel)
+                        }label:{
+                            Text("프로필 편집")
+                                .bold()
+                                .foregroundStyle(.black)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 35)
+                                .background(Color.gray.opacity(0.2))
+                                .foregroundColor(.black)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .padding(.horizontal)
+                                .padding(.top, 10)
                         }
+                    }else {
+                        
+                        let isFollowing = viewModel.user?.isFollowing ?? false
+                        
+                        
+                        Button {
+                            if isFollowing {
+                                viewModel.unfollow()
+                            } else {
+                                viewModel.follow()
+                            }
+                         
+                        } label:{
+//                            Text("팔로우")
+                            Text(isFollowing ? "팔로잉" : "팔로우")
+                                .bold()
+//                                .foregroundStyle(.white)
+                                .foregroundStyle(isFollowing ? .black : .white )
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 35)
+//                                .background(.blue)
+                                .background(isFollowing ? .gray.opacity(0.4) : .blue )
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .padding(.horizontal, 10)
+                                .padding(.top, 10)
+                        }
+                        Divider()
+                            .padding()
+                        
+                        LazyVGrid(columns: columns, spacing:2) {
+                            
+                            ForEach(viewModel.posts) {post in
+                                let url = URL(string:post.imageURL)
+                                KFImage(url)
+                                    .resizable()
+                                    .aspectRatio(1, contentMode:.fill )
+                            }
+                        }
+                        // .onAppear()은 async 가 아닌 것들 .task 는 asyvc 인 것들
+                        .task {
+                            await viewModel.loadUserPosts()
+                        }
+                        Spacer()
+                        
                     }
-                    // .onAppear()은 async 가 아닌 것들 .task 는 asyvc 인 것들
-                    .task {
-                        await viewModel.loadUserPosts()
-                    }
-                    Spacer()
                     
                 }
-                
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar{
+                ToolbarItem(placement: .topBarLeading){
+                    Button{
+                        
+                        dismiss()
+                    }label:{
+                        Image(systemName: "arrow.backward")
+                            .tint(.black)
+                        
+                    }
+                    
+                }
             }
         }
     }
 }
-
 #Preview {
     ProfileView()
 }

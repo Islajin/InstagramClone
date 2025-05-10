@@ -37,6 +37,16 @@ class ProfileViewModel{
         self.bio = tempUser?.bio ?? ""
     }
     
+    //FeedView에서 다른 사람의 프로필을 클릭하면 들어가는 곳 때문에 생성
+    init(user : User ) {
+        self.user = user
+        self.name = user.name
+        self.username = user.username
+        self.bio = user.bio ?? ""
+        
+        checkFollow()
+    }
+    
     func convertImage(item: PhotosPickerItem?) async {
         
         //item 을 안전하게 꺼냄 -> data를 컴퓨터가 읽을 수 있는 값으로 변경-> UIImage(UIKit에서 사용하는 이미지 형식)으로 변경->Image(SwiftUI에서 사용하는 이미지 형식)으로 변경
@@ -169,6 +179,34 @@ class ProfileViewModel{
             
         }catch{
             print("DEBUG: Failed to load user posts with error \(error.localizedDescription)")
+        }
+        
+    }
+}
+
+extension ProfileViewModel {
+    func follow() {
+        Task {
+            let userId = user?.id
+            await AuthManager.shared.follow(userId: userId)
+            user?.isFollowing = true
+        }
+    }
+    
+    func unfollow() {
+        Task {
+            let userId = user?.id
+            await AuthManager.shared.unfollow(userId: userId)
+            user?.isFollowing = false
+            
+            
+        }
+    }
+    
+    func checkFollow()  {
+        Task {
+            let userId = user?.id
+            self.user?.isFollowing = await AuthManager.shared.checkFollow(userId: userId)
         }
         
     }
