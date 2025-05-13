@@ -24,6 +24,22 @@ class ProfileViewModel{
     var profileImage: Image?
     var uiImage : UIImage?
     
+    var postCount: Int? {
+        user?.userCountInfo?.postCount
+        
+    }
+    
+    var followingCount: Int? {
+        user?.userCountInfo?.postCount
+        
+    }
+    
+    var followerCount: Int? {
+        user?.userCountInfo?.postCount
+        
+    }
+    
+    
     
     
     init() {
@@ -35,6 +51,10 @@ class ProfileViewModel{
         self.name = tempUser?.name ?? ""
         self.username = tempUser?.username ?? ""
         self.bio = tempUser?.bio ?? ""
+        
+        Task {
+            await loadUserCountInfo()
+        }
     }
     
     //FeedView에서 다른 사람의 프로필을 클릭하면 들어가는 곳 때문에 생성
@@ -43,20 +63,23 @@ class ProfileViewModel{
         self.name = user.name
         self.username = user.username
         self.bio = user.bio ?? ""
-        
-        checkFollow()
+            
+        Task {
+            await checkFollow()
+            await loadUserCountInfo()
+        }
     }
     
     func convertImage(item: PhotosPickerItem?) async {
         
         //item 을 안전하게 꺼냄 -> data를 컴퓨터가 읽을 수 있는 값으로 변경-> UIImage(UIKit에서 사용하는 이미지 형식)으로 변경->Image(SwiftUI에서 사용하는 이미지 형식)으로 변경
-//        
-//        guard let item = item else { return }
-//        guard let data = try? await item.loadTransferable(type: Data.self) else {return}
-//        guard let uiImage = UIImage(data: data) else {return}
-//        self.profileImage = Image(uiImage: uiImage)
-//        self.uiImage = uiImage
-//        
+        //
+        //        guard let item = item else { return }
+        //        guard let data = try? await item.loadTransferable(type: Data.self) else {return}
+        //        guard let uiImage = UIImage(data: data) else {return}
+        //        self.profileImage = Image(uiImage: uiImage)
+        //        self.uiImage = uiImage
+        //
         
         guard let imageSelection = await ImageManager.convertImage(item : item) else {return}
         
@@ -113,10 +136,10 @@ class ProfileViewModel{
         
         //만약에 let uiImage가 self.ui 이미지에 잘 저장이 된다면
         if let uiImage = self.uiImage {
-//            let imageUrl = await uploadImage(uiImage: uiImage)
+            //            let imageUrl = await uploadImage(uiImage: uiImage)
             
-//            guard let imageUrl = await ImageManager.uploadImage(uiImage: uiImage, path :"profiles") else {return}
-//            
+            //            guard let imageUrl = await ImageManager.uploadImage(uiImage: uiImage, path :"profiles") else {return}
+            //
             guard let imageUrl = await ImageManager.uploadImage(uiImage: uiImage, path :.profile) else {return}
             
             editedData["profileImageUrl"] = imageUrl
@@ -160,27 +183,32 @@ class ProfileViewModel{
     
     //posts 에서 userId가 현재 Id 와 같은 것들을 가져옴 - 즉, 내 게시글을 보여줌
     func loadUserPosts() async {
+        
+        guard let userId = user?.id else {return}
+        guard let posts =  await PostManager.loadUserPosts(userId : userId) else {return}
         //whereField 를 사용해서 같은 걸 찾을 수 있음
         //.order by(by: , 오름차순 내림차순 설정이 가능)
-        do {
-            let documents = try await Firestore.firestore().collection("posts").order(by: "date", descending: true).whereField("userId", isEqualTo: user?.id ?? "").getDocuments().documents
-            
-            var posts : [Post] = []
-            //documents 가 여러개 들어있을 거니까 반복문
-            for document in documents {
-                //document data를 post타입으로 바꾸겠음!
-                let post = try document.data(as: Post.self)
-                //그래서 배열안에 저장 할 것 임
-                posts.append(post)
-            }
-            
-                self.posts = posts
-                //함수 안에서 변형한 posts를 바깥에 있는 self.posts에 넣음
-            
-        }catch{
-            print("DEBUG: Failed to load user posts with error \(error.localizedDescription)")
-        }
-        
+        //        do {
+        //            let documents = try await Firestore.firestore().collection("posts").order(by: "date", descending: true).whereField("userId", isEqualTo: user?.id ?? "").getDocuments().documents
+        //
+        //            var posts : [Post] = []
+        //            //documents 가 여러개 들어있을 거니까 반복문
+        //            for document in documents {
+        //                //document data를 post타입으로 바꾸겠음!
+        //                let post = try document.data(as: Post.self)
+        //                //그래서 배열안에 저장 할 것 임
+        //                posts.append(post)
+        //            }
+        //
+        //                self.posts = posts
+        //                //함수 안에서 변형한 posts를 바깥에 있는 self.posts에 넣음
+        //
+        //        }catch{
+        //            print("DEBUG: Failed to load user posts with error \(error.localizedDescription)")
+        //        }
+        //
+        //    }
+        //}
     }
 }
 
@@ -190,6 +218,7 @@ extension ProfileViewModel {
             let userId = user?.id
             await AuthManager.shared.follow(userId: userId)
             user?.isFollowing = true
+            await loadUserCountInfo()
         }
     }
     
@@ -203,11 +232,17 @@ extension ProfileViewModel {
         }
     }
     
-    func checkFollow()  {
-        Task {
+    func checkFollow() async  {
+       
             let userId = user?.id
             self.user?.isFollowing = await AuthManager.shared.checkFollow(userId: userId)
-        }
         
+        
+    }
+}
+
+extension ProfileViewModel {
+    func loadUserCountInfo() async {
+        self.user?.userCountInfo = await UserCountManager.loadUserCountInfo(userId: user?.id)
     }
 }

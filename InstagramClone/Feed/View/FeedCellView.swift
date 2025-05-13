@@ -15,7 +15,8 @@ struct FeedCellView: View {
     // let post: Post 이렇게 작성해도 됨
     
     @State var viewModel: FeedCellViewModel
-    
+    @State var isCommentShowing = false
+    //isCommentShowing 이 true 면 댓글창이 보임
    
     init(post: Post ){
         self.viewModel = FeedCellViewModel(post: post)
@@ -63,8 +64,23 @@ struct FeedCellView: View {
                 }
             
             HStack {
-                Image(systemName: "heart")
-                Image(systemName: "bubble.right")
+                let isLike = viewModel.post.isLike ?? false
+                Button {
+                    Task {
+                        isLike ?  await viewModel.unlike() :  await viewModel.like()
+                    }
+                } label: {
+                    Image(systemName : isLike ?  "heart.fill" : "heart")
+                        .foregroundStyle(isLike ? .red : .primary  ) //.primary는 기본색상임
+                }
+                
+                Button {
+                    
+                    isCommentShowing = true
+                } label:
+                { Image(systemName: "bubble.right")}
+                    .tint(.black)
+                
                 Image(systemName: "paperplane")
                 Spacer()
                 Image(systemName: "bookmark")
@@ -82,11 +98,15 @@ struct FeedCellView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
             
-            Text("댓글 25개 더보기")
-                .foregroundStyle(.gray)
-                .font(.footnote)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
+            
+            Button {isCommentShowing = true }
+            label: {
+                Text("댓글 \(viewModel.commentCount)개 더보기")
+                    .foregroundStyle(.gray)
+                    .font(.footnote)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                } .tint(.black)
             
             Text("3일전")
                 .foregroundStyle(.gray)
@@ -98,5 +118,17 @@ struct FeedCellView: View {
             
         }
         .padding(.bottom)
+        .sheet(isPresented: $isCommentShowing, content: {
+            CommentView(post: viewModel.post)
+                .presentationDragIndicator(.visible)
+        })
+        .onChange(of :isCommentShowing) {
+            oldValue, newValue in
+            if newValue == false {
+                Task {
+                    await viewModel.loadCommentCount()
+                }
+            }
+        }
     }
 }

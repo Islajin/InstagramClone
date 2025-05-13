@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseAuth
 
-struct User: Codable{
+struct User: Codable, Identifiable{
     
     let id : String
     let email: String
@@ -16,6 +16,9 @@ struct User: Codable{
     var name: String
     var bio: String?
     var profileImageUrl: String?
+    
+    var userCountInfo : UserCountInfo? //Codable 을 설정하면 모든 변수가 Codable을 따라야하기때문에 UserCountInfo를 Codable로 바꿔주어야 한다.
+    //String 값들은 다 Codable임
     
     var isFollowing : Bool?
     
